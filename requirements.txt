@@ -1,0 +1,9 @@
+apify-client>=3
+python-dotenv>=1.0
+pandas>=2.2.3
+chromadb>=1.0
+tzdata
+tavily-python>=0.5
+yfinance>=0.2.40
+scikit-learn>=1.5
+matplotlib>=3.8
