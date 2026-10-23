@@ -112,8 +112,11 @@ def event_feats(ev, w):
     for cat in CATS:
         out[f"n_{cat.lower()}"] = int((due.category == cat).sum())
     out["n_high"] = int((due.importance == "high").sum())
-    for cat, key in (("CPI", "cpi"), ("FOMC_DECISION", "fomc"), ("EMPLOYMENT", "emp")):
-        c = ev[ev.category == cat]
+    # "emp" = the monthly jobs report (Nonfarm Payrolls) only. The EMPLOYMENT category also holds
+    # weekly jobless claims and ADP, which would make "days to next jobs report" always <= 7.
+    nfp = ev["name"].astype(str).str.lower().str.contains("nonfarm")
+    for mask, key in ((ev.category == "CPI", "cpi"), (ev.category == "FOMC_DECISION", "fomc"), (nfp, "emp")):
+        c = ev[mask]
         before, after = c[c.ts < w], c[c.ts >= w]
         out[f"days_since_{key}"] = (w - before.ts.max()).days if len(before) else np.nan
         out[f"days_to_{key}"] = (after.ts.min() - w).days if len(after) else np.nan
@@ -145,7 +148,7 @@ def perm_feats(tp, w):
 def build_table(events, news, trades, prices, through=None) -> pd.DataFrame:
     ev = events.copy()
     ev["ts"] = pd.to_datetime(ev["ts_utc"], utc=True)
-    for c in ("surprise", "importance", "category"):
+    for c in ("surprise", "importance", "category", "name"):
         if c not in ev:
             ev[c] = np.nan
     ev = ev.sort_values("ts")

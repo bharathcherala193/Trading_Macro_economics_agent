@@ -37,6 +37,9 @@ def metrics_table(res: pd.DataFrame) -> str:
 
 def interpret(title: str, res: pd.DataFrame) -> str:
     n = len(res)
+    if n < 12:
+        return (f"**{title}.** Only {n} out-of-sample weeks are available, far too few for Sharpe or Sortino "
+                f"to mean anything. The figures above are shown for completeness and support no conclusion.")
     m = {k: W.metrics(res[k]) for k in LABELS}
     sm, se_, st = (m[k]["sharpe"] for k in ("model", "equal_weight", "trailing_best"))
     ic = res.rank_ic.mean()
@@ -69,7 +72,8 @@ def facts() -> dict:
             "n_news": len(nw), "nw0": d(nw.published_utc).min(), "nw1": d(nw.published_utc).max(),
             "n_bars": len(px), "px0": d(px.index).min(), "px1": d(px.index).max(),
             "n_trades": len(tr), "n_perms": tr.perm_id.nunique(),
-            "finbert": any(k.startswith("finbert:") for k in keys)}
+            "finbert": any(k.startswith("finbert:") for k in keys),
+            "has_nfp": bool(ev.name.astype(str).str.lower().str.contains("nonfarm").any())}
 
 
 def build(fx: dict, runs: list) -> str:
@@ -117,8 +121,9 @@ def build(fx: dict, runs: list) -> str:
          "- Permutation history uses only trades that have already exited.",
          "\n## 5. Results"]
     for title, res in runs:
+        note = " Sortino is n/a for a series with no losing week." if (res[list(LABELS)].min() >= 0).any() else ""
         L += [f"\n### {title}", metrics_table(res),
-              f"\nMean weekly rank-IC: {res.rank_ic.mean():+.3f}. Sortino is n/a when no week had a loss.",
+              f"\nMean weekly rank-IC: {res.rank_ic.mean():+.3f}.{note}",
               "\n" + interpret(title, res)]
     L += ["\n## 6. Limitations",
           f"- **Short sample.** Weekly walk-forward over about {max(len(r) for _, r in runs)} test weeks. The 36 "
@@ -129,6 +134,9 @@ def build(fx: dict, runs: list) -> str:
         L.append(f"- **Event coverage.** Calendar events end {fx['ev1']:%d %b %Y}, earlier than prices and news "
                  f"({fx['px1']:%d %b %Y}). The event-feature run is limited to the covered weeks, and the second run "
                  f"excludes events so it can use the full period.")
+    if not fx.get("has_nfp", True):
+        L.append("- **No Nonfarm Payrolls events are in the event data,** so the jobs-report features are empty. "
+                 "The calendar scrape was cut off by a row cap and needs re-running with the category filter.")
     L += ["- **Sentiment is approximate**, and the model's use of it is only as good as the scorer.",
           "- **Two feature sets** were evaluated (with and without calendar events); no other variants were tried.",
           "\n## 7. Reproduce",

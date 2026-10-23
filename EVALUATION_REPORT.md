@@ -1,5 +1,5 @@
 # Evaluation Report: Macro-Event Strategy Selection
-*Generated 13 Oct 2026. Numbers below are produced by the pipeline, not typed in.*
+*Generated 23 Oct 2026. Numbers below are produced by the pipeline, not typed in.*
 
 ## 1. What was built
 A pipeline that (1) scrapes a US macro calendar and recent macro news, (2) generates trade logs for 36 parameter permutations of a moving-average strategy on SPY, (3) builds weekly time-based, event, news and market features, (4) trains a model to predict each permutation's next-week P&L, and (5) selects the predicted-best permutation each week under walk-forward validation.
@@ -31,9 +31,9 @@ A pipeline that (1) scrapes a US macro calendar and recent macro news, (2) gener
 | Baseline: best permutation so far | 7.44 | n/a | 0.0% | 3.7% | 75.0% | 4 |
 | Baseline: average of all permutations | 8.45 | n/a | 0.0% | 2.0% | 75.0% | 4 |
 
-Mean weekly rank-IC: +0.075. Sortino is n/a when no week had a loss.
+Mean weekly rank-IC: +0.079. Sortino is n/a for a series with no losing week.
 
-**Calendar events + news + market features.** Over 4 out-of-sample weeks the model's Sharpe was 7.12, against 8.45 for the average of all permutations and 7.44 for the best-so-far rule. Mean weekly rank-IC (does the model rank permutations in the right order?) was +0.075. The model did not show a reliable ability to pick better permutations than chance. With 4 weeks the approximate standard error of an annualised Sharpe is about +/-3.6, so gaps of this size cannot be told apart from luck.
+**Calendar events + news + market features.** Only 4 out-of-sample weeks are available, far too few for Sharpe or Sortino to mean anything. The figures above are shown for completeness and support no conclusion.
 
 ### News + market features only (no calendar events)
 | Strategy | Sharpe | Sortino | Max drawdown | Total return | Hit rate | Weeks |
@@ -42,7 +42,7 @@ Mean weekly rank-IC: +0.075. Sortino is n/a when no week had a loss.
 | Baseline: best permutation so far | 0.45 | 0.71 | -4.3% | 1.5% | 40.0% | 20 |
 | Baseline: average of all permutations | -1.03 | -1.27 | -4.2% | -1.9% | 45.0% | 20 |
 
-Mean weekly rank-IC: +0.031. Sortino is n/a when no week had a loss.
+Mean weekly rank-IC: +0.031.
 
 **News + market features only (no calendar events).** Over 20 out-of-sample weeks the model's Sharpe was -0.57, against -1.03 for the average of all permutations and 0.45 for the best-so-far rule. Mean weekly rank-IC (does the model rank permutations in the right order?) was +0.031. The model did not show a reliable ability to pick better permutations than chance. With 20 weeks the approximate standard error of an annualised Sharpe is about +/-1.6, so gaps of this size cannot be told apart from luck.
 
@@ -50,6 +50,7 @@ Mean weekly rank-IC: +0.031. Sortino is n/a when no week had a loss.
 - **Short sample.** Weekly walk-forward over about 20 test weeks. The 36 permutations trade the same prices, so the effective sample is far smaller than the row count.
 - **Self-generated trade logs** from one simple strategy on one instrument. Results say nothing about the company's own strategies; the pipeline accepts a real trade log with the same columns.
 - **Event coverage.** Calendar events end 18 Jun 2026, earlier than prices and news (08 Oct 2026). The event-feature run is limited to the covered weeks, and the second run excludes events so it can use the full period.
+- **No Nonfarm Payrolls events are in the event data,** so the jobs-report features are empty. The calendar scrape was cut off by a row cap and needs re-running with the category filter.
 - **Sentiment is approximate**, and the model's use of it is only as good as the scorer.
 - **Two feature sets** were evaluated (with and without calendar events); no other variants were tried.
 

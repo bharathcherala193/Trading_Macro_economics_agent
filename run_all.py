@@ -11,7 +11,6 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--yes", action="store_true", help="skip cost confirmation prompts")
@@ -35,7 +34,6 @@ def main():
         if r.returncode != 0:
             raise SystemExit(f"Step failed: {script} (exit {r.returncode})")
     print("\nDone. See outputs/ and EVALUATION_REPORT.md")
-
 
 if __name__ == "__main__":
     main()

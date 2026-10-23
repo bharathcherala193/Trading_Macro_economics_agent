@@ -1,6 +1,6 @@
-# US Macro Outlook (as of 13 Oct 2026)
+# US Macro Outlook (as of 23 Oct 2026)
 *Calendar data through 18 Jun 2026; news through 09 Oct 2026. Generated from scraped data by fixed rules.*
-> **Note:** the event calendar ends 116 days before this date, so releases since 18 Jun are not reflected in the data section.
+> **Note:** the event calendar ends 126 days before this date, so releases since 18 Jun are not reflected in the data section.
 
 ## Sentiment
 News tone over the last week is **mixed** (score -0.09), improving versus the prior week (-0.41); the 4-week average is -0.10. Scores come from FinBERT applied to headlines and snippets; treat them as a rough gauge.

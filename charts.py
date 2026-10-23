@@ -12,17 +12,13 @@ matplotlib.use("Agg")  # render to files, no window needed
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
 import config
 import features as F
-
 OUT = config.ROOT / "outputs"
 COLORS = {"CPI": "#c0392b", "FOMC decision": "#8e44ad", "Nonfarm payrolls": "#16a085"}
 
-
 def method_label() -> str:
     return "FinBERT" if F._backend()[0] == "finbert" else "word-list"
-
 
 def prep_news(nw: pd.DataFrame) -> pd.DataFrame:
     d = nw[nw["has_date"] == 1].copy() if "has_date" in nw else nw.copy()
@@ -30,7 +26,6 @@ def prep_news(nw: pd.DataFrame) -> pd.DataFrame:
     d["sent"] = d["text"].map(F.score_text)
     d["day"] = d["pub"].dt.tz_convert(None).dt.normalize()  # naive UTC dates plot cleanly
     return d
-
 
 def marker_dates(ev: pd.DataFrame):
     """Release dates worth marking. We mark nonfarm payrolls by NAME, not the whole
@@ -44,7 +39,6 @@ def marker_dates(ev: pd.DataFrame):
              "FOMC decision": sorted(e[e.category == "FOMC_DECISION"].day.unique()),
              "Nonfarm payrolls": sorted(e[names.str.contains("nonfarm")].day.unique())}
     return marks, e.day.max()
-
 
 def sentiment_timeline(ev, nw, path):
     d = prep_news(nw)
@@ -79,7 +73,6 @@ def sentiment_timeline(ev, nw, path):
     fig.savefig(path, dpi=150)
     plt.close(fig)
 
-
 def sentiment_matrix(nw, path):
     d = prep_news(nw)
     if "query" not in d:
@@ -104,7 +97,6 @@ def sentiment_matrix(nw, path):
     fig.savefig(path, dpi=150)
     plt.close(fig)
 
-
 def main():
     import store
     OUT.mkdir(parents=True, exist_ok=True)
@@ -112,7 +104,5 @@ def main():
     sentiment_timeline(ev, nw, OUT / "sentiment_timeline.png")
     sentiment_matrix(nw, OUT / "sentiment_matrix.png")
     print("charts ->", OUT)
-
-
 if __name__ == "__main__":
     main()
