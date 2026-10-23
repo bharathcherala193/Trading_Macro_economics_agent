@@ -3,3 +3,4 @@ data/chroma/
 __pycache__/
 .venv/
 *.pyc
+submission.zip
